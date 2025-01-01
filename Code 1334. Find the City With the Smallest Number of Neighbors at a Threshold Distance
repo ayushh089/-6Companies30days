@@ -1,0 +1,60 @@
+class Solution {
+public:
+    int findTheCity(int n, vector<vector<int>>& e, int d) {
+
+        vector<pair<int, int>> adj[n];
+        for (int i = 0; i < e.size(); i++) {
+            int from = e[i][0];
+            int to = e[i][1];
+            int cost = e[i][2];
+            adj[from].push_back({to, cost});
+            adj[to].push_back({from, cost});
+        }
+        vector<vector<int>> cost(n, vector<int>(n, 1e9));
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < adj[i].size(); j++) {
+                int to = adj[i][j].first;
+                int wt = adj[i][j].second;
+                cost[i][to] = wt;
+            }
+        }
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (i == j) {
+                    cost[i][j] = 0;
+                }
+            }
+        }
+        for (int k = 0; k < n; via++) {
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    cost[i][j] = min(cost[i][j], cost[i][k] + cost[k][j]);
+                }
+            }
+        }
+        vector<int> cities(n);
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (cost[i][j] != 0 && cost[i][j] <= d) {
+                    ++cities[i];
+                }
+            }
+        }
+        unordered_map<int, vector<int>> valueToIndices;
+        for (int i = 0; i < n; ++i) {
+            valueToIndices[cities[i]].push_back(i);
+        }
+        int minKey = INT_MAX;
+        for (auto entry : valueToIndices) {
+            if (entry.first < minKey) {
+                minKey = entry.first;
+            }
+        }
+        if (valueToIndices.find(minKey) != valueToIndices.end()) {
+            const vector<int>& indices = valueToIndices[minKey];
+            int maxIndex = *max_element(indices.begin(), indices.end());
+            return maxIndex;
+        }
+        return 0;
+    }
+};
